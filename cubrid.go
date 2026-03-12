@@ -96,6 +96,12 @@ func (dialector Dialector) Initialize(db *gorm.DB) (err error) {
 	}
 
 	callbacks.RegisterDefaultCallbacks(db, &callbacks.Config{})
+
+	if sqlDB, ok := db.ConnPool.(*sql.DB); ok {
+		if err = sqlDB.Ping(); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

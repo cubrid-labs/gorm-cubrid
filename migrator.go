@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"gorm.io/gorm/migrator"
 )
 
@@ -93,10 +94,60 @@ func (m Migrator) HasIndex(value interface{}, name string) bool {
 	return count > 0
 }
 
+// RenameTable renames a table.
+// CUBRID uses "RENAME TABLE old TO new" rather than "ALTER TABLE old RENAME TO new".
+func (m Migrator) RenameTable(oldName, newName interface{}) error {
+	return m.RunWithValue(oldName, func(oldStmt *gorm.Statement) error {
+		return m.RunWithValue(newName, func(newStmt *gorm.Statement) error {
+			return m.DB.Exec(
+				"RENAME TABLE ? TO ?",
+				m.CurrentTable(oldStmt),
+				clause.Table{Name: newStmt.Table},
+			).Error
+		})
+	})
+}
+
+// DropIndex drops the named index from the table associated with value.
+// CUBRID requires "DROP INDEX idx ON table", unlike the base "DROP INDEX idx".
+func (m Migrator) DropIndex(value interface{}, name string) error {
+	return m.RunWithValue(value, func(stmt *gorm.Statement) error {
+		if stmt.Schema != nil {
+			if idx := stmt.Schema.LookIndex(name); idx != nil {
+				name = idx.Name
+			}
+		}
+		return m.DB.Exec(
+			"DROP INDEX ? ON ?",
+			clause.Column{Name: name},
+			m.CurrentTable(stmt),
+		).Error
+	})
+}
+
+// AlterColumn changes an existing column's definition.
+// CUBRID uses "ALTER TABLE t MODIFY COLUMN col type" instead of the PostgreSQL-style
+// "ALTER TABLE t ALTER COLUMN col TYPE type" that the base migrator generates.
+func (m Migrator) AlterColumn(value interface{}, field string) error {
+	return m.RunWithValue(value, func(stmt *gorm.Statement) error {
+		if f := stmt.Schema.LookUpField(field); f != nil {
+			fileType := m.DB.Migrator().FullDataTypeOf(f)
+			return m.DB.Exec(
+				"ALTER TABLE ? MODIFY COLUMN ? ?",
+				m.CurrentTable(stmt),
+				clause.Column{Name: f.DBName},
+				fileType,
+			).Error
+		}
+		return fmt.Errorf("failed to look up field with name: %s", field)
+	})
+}
+
 // ColumnTypes returns detailed column type information for the table
 // associated with value, in ordinal position order.
 // Requires CUBRID 11.2+ (INFORMATION_SCHEMA support).
 func (m Migrator) ColumnTypes(value interface{}) (columnTypes []gorm.ColumnType, err error) {
+	currentDatabase := m.CurrentDatabase()
 	err = m.RunWithValue(value, func(stmt *gorm.Statement) error {
 		const query = `
 			SELECT
@@ -113,7 +164,7 @@ func (m Migrator) ColumnTypes(value interface{}) (columnTypes []gorm.ColumnType,
 			WHERE table_schema = ? AND table_name = ?
 			ORDER BY ordinal_position`
 
-		rows, rowErr := m.DB.Raw(query, m.CurrentDatabase(), strings.ToLower(stmt.Table)).Rows()
+		rows, rowErr := m.DB.Raw(query, currentDatabase, strings.ToLower(stmt.Table)).Rows()
 		if rowErr != nil {
 			return rowErr
 		}
