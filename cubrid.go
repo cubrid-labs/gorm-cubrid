@@ -50,6 +50,11 @@ type Config struct {
 	// DefaultStringSize sets the default length for VARCHAR fields.
 	// Defaults to 256 if not set.
 	DefaultStringSize uint
+
+	// SkipPing skips the connection validation Ping() on Initialize.
+	// Useful for lazy connections, test environments, or when the caller
+	// manages connection health separately.
+	SkipPing bool
 }
 
 // Dialector implements gorm.Dialector for CUBRID databases.
@@ -82,14 +87,16 @@ func (dialector Dialector) Name() string {
 // If Config.Conn is provided, it is used directly; otherwise a new connection
 // is opened using Config.DSN.
 func (dialector Dialector) Initialize(db *gorm.DB) (err error) {
-	if dialector.DriverName == "" {
-		dialector.DriverName = "cubrid"
+	// Resolve driver name locally to avoid mutating the shared *Config.
+	driverName := dialector.DriverName
+	if driverName == "" {
+		driverName = "cubrid"
 	}
 
 	if dialector.Conn != nil {
 		db.ConnPool = dialector.Conn
 	} else {
-		db.ConnPool, err = sql.Open(dialector.DriverName, dialector.DSN)
+		db.ConnPool, err = sql.Open(driverName, dialector.DSN)
 		if err != nil {
 			return err
 		}
@@ -97,9 +104,11 @@ func (dialector Dialector) Initialize(db *gorm.DB) (err error) {
 
 	callbacks.RegisterDefaultCallbacks(db, &callbacks.Config{})
 
-	if sqlDB, ok := db.ConnPool.(*sql.DB); ok {
-		if err = sqlDB.Ping(); err != nil {
-			return err
+	if !dialector.SkipPing {
+		if sqlDB, ok := db.ConnPool.(*sql.DB); ok {
+			if err = sqlDB.Ping(); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -132,9 +141,9 @@ func (dialector Dialector) DataTypeOf(field *schema.Field) string {
 	case schema.Bool:
 		return "tinyint(1)"
 	case schema.Int, schema.Uint:
-		return dialector.intSQLType(field)
+		return intSQLType(field)
 	case schema.Float:
-		return dialector.floatSQLType(field)
+		return floatSQLType(field)
 	case schema.String:
 		return dialector.stringSQLType(field)
 	case schema.Time:
@@ -150,7 +159,9 @@ func (dialector Dialector) DataTypeOf(field *schema.Field) string {
 	}
 }
 
-func (dialector Dialector) intSQLType(field *schema.Field) string {
+// intSQLType maps an integer schema field to the appropriate CUBRID SQL type.
+// CUBRID has no unsigned integer types; uint fields map to the signed equivalent.
+func intSQLType(field *schema.Field) string {
 	var sqlType string
 	switch {
 	case field.Size <= 8:
@@ -168,7 +179,8 @@ func (dialector Dialector) intSQLType(field *schema.Field) string {
 	return sqlType
 }
 
-func (dialector Dialector) floatSQLType(field *schema.Field) string {
+// floatSQLType maps a float schema field to the appropriate CUBRID SQL type.
+func floatSQLType(field *schema.Field) string {
 	if field.Precision > 0 {
 		return fmt.Sprintf("numeric(%d, %d)", field.Precision, field.Scale)
 	}

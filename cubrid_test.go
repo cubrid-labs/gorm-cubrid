@@ -46,6 +46,24 @@ func TestNew_CustomDriverName(t *testing.T) {
 	}
 }
 
+// Initialize must not mutate the original Config when applying a default DriverName.
+// Sharing one Config across multiple gorm.Open calls must be safe.
+func TestInitialize_NoConfigMutation(t *testing.T) {
+	cfg := &Config{DSN: "cci:CUBRID:localhost:33000:demodb:public::"}
+	_ = New(*cfg) // simulate creating a Dialector from a shared config
+	if cfg.DriverName != "" {
+		t.Errorf("Config.DriverName was mutated to %q, want empty string", cfg.DriverName)
+	}
+}
+
+func TestNew_SkipPing(t *testing.T) {
+	d := New(Config{DSN: "cci:CUBRID:localhost:33000:demodb:public::", SkipPing: true})
+	inner := d.(*Dialector)
+	if !inner.SkipPing {
+		t.Error("SkipPing should be true")
+	}
+}
+
 // --- DataTypeOf ---
 
 func TestDataTypeOf(t *testing.T) {

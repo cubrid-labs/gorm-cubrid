@@ -42,11 +42,12 @@ func (m Migrator) GetTables() (tableList []string, err error) {
 // value may be a struct, pointer to struct, or table name string.
 func (m Migrator) HasTable(value interface{}) bool {
 	var count int64
+	currentDatabase := m.CurrentDatabase()
 	m.RunWithValue(value, func(stmt *gorm.Statement) error {
 		return m.DB.Raw(
 			"SELECT count(*) FROM information_schema.tables "+
 				"WHERE table_schema = ? AND table_name = ? AND table_type = 'BASE TABLE'",
-			m.CurrentDatabase(),
+			currentDatabase,
 			strings.ToLower(stmt.Table),
 		).Row().Scan(&count)
 	})
@@ -57,6 +58,7 @@ func (m Migrator) HasTable(value interface{}) bool {
 // field may be the Go struct field name or the DB column name.
 func (m Migrator) HasColumn(value interface{}, field string) bool {
 	var count int64
+	currentDatabase := m.CurrentDatabase()
 	m.RunWithValue(value, func(stmt *gorm.Statement) error {
 		columnName := field
 		if stmt.Schema != nil {
@@ -67,7 +69,7 @@ func (m Migrator) HasColumn(value interface{}, field string) bool {
 		return m.DB.Raw(
 			"SELECT count(*) FROM information_schema.columns "+
 				"WHERE table_schema = ? AND table_name = ? AND column_name = ?",
-			m.CurrentDatabase(),
+			currentDatabase,
 			strings.ToLower(stmt.Table),
 			columnName,
 		).Row().Scan(&count)
