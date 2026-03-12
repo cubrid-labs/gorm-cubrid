@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "claude/**"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    name: Unit Tests (Go ${{ matrix.go }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ["1.21", "1.22", "1.23"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go ${{ matrix.go }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test (with race detector)
+        run: go test -race -count=1 -coverprofile=coverage.out ./...
+
+      - name: Upload coverage
+        if: matrix.go == '1.23'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.out
+
+  integration:
+    name: Integration Tests (Go ${{ matrix.go }}, CUBRID ${{ matrix.cubrid }})
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ["1.23"]
+        cubrid: ["11.3"]
+
+    services:
+      cubrid:
+        image: cubrid/cubrid:${{ matrix.cubrid }}
+        env:
+          CUBRID_DB: demodb
+        ports:
+          - 33000:33000
+        options: >-
+          --health-cmd "cubrid server status demodb"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go ${{ matrix.go }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Run integration tests
+        env:
+          CUBRID_DSN: "cci:CUBRID:localhost:33000:demodb:dba::"
+        run: go test -tags integration -race -count=1 ./...
