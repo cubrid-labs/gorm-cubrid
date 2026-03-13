@@ -1,5 +1,14 @@
 # GORM CUBRID Driver
 
+<!-- BADGES:START -->
+[![Go Reference](https://pkg.go.dev/badge/github.com/cubrid-labs/gorm-cubrid.svg)](https://pkg.go.dev/github.com/cubrid-labs/gorm-cubrid)
+[![ci workflow](https://github.com/cubrid-labs/gorm-cubrid/actions/workflows/ci.yml/badge.svg)](https://github.com/cubrid-labs/gorm-cubrid/actions/workflows/ci.yml)
+[![Go 1.21+](https://img.shields.io/badge/go-1.21%2B-blue.svg)](https://go.dev)
+[![license](https://img.shields.io/github/license/cubrid-labs/gorm-cubrid)](https://github.com/cubrid-labs/gorm-cubrid/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/cubrid-labs/gorm-cubrid)](https://github.com/cubrid-labs/gorm-cubrid)
+<!-- BADGES:END -->
+
+
 CUBRID database driver for [GORM](https://gorm.io/).
 
 ## Requirements
