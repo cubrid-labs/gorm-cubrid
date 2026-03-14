@@ -1,0 +1,38 @@
+# gorm-cubrid
+
+> GORM database driver for CUBRID. Provides full ORM support including AutoMigrate, CRUD operations, associations, transactions, and hooks for Go 1.21+ applications.
+
+gorm-cubrid is a GORM dialector that enables Go developers to use CUBRID with GORM's full feature set — models, migrations, associations, hooks, and transactions. It connects to CUBRID via the CCI (Client C Interface) driver.
+
+Key facts:
+- DSN format: `cci:CUBRID:<host>:<port>:<dbname>:<user>:<password>:`
+- Install: `go get github.com/cubrid-labs/gorm-cubrid`
+- Also requires: `go get github.com/CUBRID/cubrid-go` (CCI-based SQL driver, requires CGO)
+- Usage: `gorm.Open(cubrid.Open(dsn), &gorm.Config{})`
+- Supports: AutoMigrate, CRUD, HasOne, HasMany, BelongsTo, ManyToMany, transactions, hooks
+- CUBRID-specific: `bool` → `TINYINT(1)`, no unsigned types, `AUTO_INCREMENT` native
+- Schema introspection requires CUBRID 11.2+ (`INFORMATION_SCHEMA`)
+
+## Docs
+
+- [README](https://github.com/cubrid-labs/gorm-cubrid/blob/main/README.md): Full documentation with DSN format, usage examples, type mapping, and features
+- [Contributing Guide](https://github.com/cubrid-labs/gorm-cubrid/blob/main/CONTRIBUTING.md): Contribution guidelines
+- [Changelog](https://github.com/cubrid-labs/gorm-cubrid/blob/main/CHANGELOG.md): Release history
+
+## Examples
+
+- [Quick Start](https://github.com/cubrid-labs/gorm-cubrid/blob/main/README.md#usage): Basic GORM setup with CUBRID, AutoMigrate, and CRUD
+- [Advanced Config](https://github.com/cubrid-labs/gorm-cubrid/blob/main/README.md#advanced-configuration): Custom string sizes and configuration options
+- [Existing Connection](https://github.com/cubrid-labs/gorm-cubrid/blob/main/README.md#using-an-existing-connection): Reuse an existing `database/sql` connection
+- [CUBRID Cookbook — GORM](https://github.com/cubrid-labs/cubrid-cookbook/tree/main/go/gorm): Production-ready GORM examples — connect, CRUD, relationships
+
+## API Reference
+
+- [Source — cubrid.go](https://github.com/cubrid-labs/gorm-cubrid/blob/main/cubrid.go): GORM Dialector — Open(), New(), Config, data type mapping
+- [Source — migrator.go](https://github.com/cubrid-labs/gorm-cubrid/blob/main/migrator.go): GORM Migrator — AutoMigrate, HasTable, HasColumn, ColumnTypes
+
+## Ecosystem
+
+- [cubrid-go](https://github.com/cubrid-labs/cubrid-go): Pure Go database/sql driver for CUBRID (alternative driver, no CGO)
+- [cubrid-cookbook](https://github.com/cubrid-labs/cubrid-cookbook): Production-ready examples across Python, Node.js, and Go
+- [CUBRID](https://www.cubrid.org/): The CUBRID database
