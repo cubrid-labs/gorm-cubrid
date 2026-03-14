@@ -98,7 +98,7 @@ func (dialector Dialector) Initialize(db *gorm.DB) (err error) {
 	} else {
 		db.ConnPool, err = sql.Open(driverName, dialector.DSN)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to open database connection: %w", err)
 		}
 	}
 
@@ -107,7 +107,7 @@ func (dialector Dialector) Initialize(db *gorm.DB) (err error) {
 	if !dialector.SkipPing {
 		if sqlDB, ok := db.ConnPool.(*sql.DB); ok {
 			if err = sqlDB.Ping(); err != nil {
-				return err
+				return fmt.Errorf("failed to ping database: %w", err)
 			}
 		}
 	}
