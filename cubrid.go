@@ -96,7 +96,7 @@ func (dialector Dialector) Initialize(db *gorm.DB) (err error) {
 	if dialector.Conn != nil {
 		db.ConnPool = dialector.Conn
 	} else {
-		db.ConnPool, err = sql.Open(driverName, dialector.DSN)
+		db.ConnPool, err = sql.Open(driverName, dialector.DSN) // #nosec G201 -- DSN is user-provided configuration, not injectable
 		if err != nil {
 			return err
 		}

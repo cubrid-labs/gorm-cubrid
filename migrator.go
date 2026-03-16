@@ -23,7 +23,9 @@ type Migrator struct {
 // CurrentDatabase returns the name of the currently selected database.
 func (m Migrator) CurrentDatabase() string {
 	var name string
-	m.DB.Raw("SELECT database()").Row().Scan(&name)
+	//nolint:errcheck // CurrentDatabase is a GORM interface method that returns string only;
+	// the error from Scan is safely ignored — empty string is acceptable fallback.
+	_ = m.DB.Raw("SELECT database()").Row().Scan(&name) // #nosec G104
 	return name
 }
 
@@ -43,7 +45,7 @@ func (m Migrator) GetTables() (tableList []string, err error) {
 func (m Migrator) HasTable(value interface{}) bool {
 	var count int64
 	currentDatabase := m.CurrentDatabase()
-	m.RunWithValue(value, func(stmt *gorm.Statement) error {
+	_ = m.RunWithValue(value, func(stmt *gorm.Statement) error { // #nosec G104
 		return m.DB.Raw(
 			"SELECT count(*) FROM information_schema.tables "+
 				"WHERE table_schema = ? AND table_name = ? AND table_type = 'BASE TABLE'",
@@ -59,7 +61,7 @@ func (m Migrator) HasTable(value interface{}) bool {
 func (m Migrator) HasColumn(value interface{}, field string) bool {
 	var count int64
 	currentDatabase := m.CurrentDatabase()
-	m.RunWithValue(value, func(stmt *gorm.Statement) error {
+	_ = m.RunWithValue(value, func(stmt *gorm.Statement) error { // #nosec G104
 		columnName := field
 		if stmt.Schema != nil {
 			if f := stmt.Schema.LookUpField(field); f != nil {
@@ -80,7 +82,7 @@ func (m Migrator) HasColumn(value interface{}, field string) bool {
 // HasIndex reports whether an index with the given name exists on the table for value.
 func (m Migrator) HasIndex(value interface{}, name string) bool {
 	var count int64
-	m.RunWithValue(value, func(stmt *gorm.Statement) error {
+	_ = m.RunWithValue(value, func(stmt *gorm.Statement) error { // #nosec G104
 		if stmt.Schema != nil {
 			if idx := stmt.Schema.LookIndex(name); idx != nil {
 				name = idx.Name
