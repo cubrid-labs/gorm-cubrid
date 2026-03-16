@@ -1,4 +1,4 @@
-.PHONY: all build test test-verbose test-integration vet fmt lint tidy clean
+.PHONY: all build test test-verbose test-integration vet fmt lint tidy clean security check-all changelog clean-all doctor
 
 # Default target
 all: build test
@@ -41,3 +41,28 @@ tidy:
 ## Clean generated files
 clean:
 	rm -f coverage.out
+
+# Security scan
+security:
+	@which govulncheck > /dev/null 2>&1 && govulncheck ./... || echo "govulncheck not installed, skipping"
+
+# Full check (all quality gates)
+check-all: fmt vet lint security test
+
+# Generate changelog (requires git-cliff)
+changelog:
+	@which git-cliff > /dev/null 2>&1 && git-cliff -o CHANGELOG.md || echo "git-cliff not installed, skipping"
+
+# Clean all artifacts
+clean-all: clean
+	rm -rf dist/ bin/
+
+# Doctor check (verify tool availability)
+doctor:
+	@echo "=== Go Environment ==="
+	@go version
+	@echo ""
+	@echo "=== Tools ==="
+	@which golangci-lint > /dev/null 2>&1 && echo "✓ golangci-lint" || echo "✗ golangci-lint (optional)"
+	@which govulncheck > /dev/null 2>&1 && echo "✓ govulncheck" || echo "✗ govulncheck (optional: go install golang.org/x/vuln/cmd/govulncheck@latest)"
+	@which git-cliff > /dev/null 2>&1 && echo "✓ git-cliff" || echo "✗ git-cliff (optional)"
