@@ -4,7 +4,7 @@
 //
 // Users must import the CUBRID SQL driver separately:
 //
-//	import _ "github.com/CUBRID/cubrid-go"
+//	import _ "github.com/cubrid-labs/cubrid-go"
 //
 // Then open a connection using the CUBRID DSN format:
 //
@@ -68,7 +68,7 @@ type Dialector struct {
 //
 // Note: The CUBRID SQL driver must be imported separately:
 //
-//	import _ "github.com/CUBRID/cubrid-go"
+//	import _ "github.com/cubrid-labs/cubrid-go"
 func Open(dsn string) gorm.Dialector {
 	return &Dialector{Config: &Config{DSN: dsn}}
 }

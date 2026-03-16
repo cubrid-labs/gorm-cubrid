@@ -14,8 +14,7 @@ CUBRID database driver for [GORM](https://gorm.io/).
 ## Requirements
 
 - Go 1.21+
-- CUBRID 11.2+ (or CCI 11.0.0+)
-- CUBRID CCI library installed on the system
+- CUBRID 10.2+ database server
 
 ## Installation
 
@@ -26,12 +25,10 @@ go get github.com/cubrid-labs/gorm-cubrid
 The CUBRID Go SQL driver must also be installed:
 
 ```bash
-go get github.com/CUBRID/cubrid-go
+go get github.com/cubrid-labs/cubrid-go
 ```
 
-> **Note:** `github.com/CUBRID/cubrid-go` uses CGO and requires the CUBRID CCI
-> library. See the [cubrid-go README](https://github.com/CUBRID/cubrid-go) for
-> installation instructions.
+`cubrid-go` is a pure Go driver — no CGO or native libraries required.
 
 ## Usage
 
@@ -39,7 +36,7 @@ go get github.com/CUBRID/cubrid-go
 package main
 
 import (
-    _ "github.com/CUBRID/cubrid-go" // register CUBRID SQL driver
+    _ "github.com/cubrid-labs/cubrid-go" // register CUBRID SQL driver
 
     cubrid "github.com/cubrid-labs/gorm-cubrid"
     "gorm.io/gorm"

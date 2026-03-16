@@ -83,11 +83,12 @@ go vet ./...
 | 패키지 | 역할 |
 |---|---|
 | `gorm.io/gorm v1.25.10` | GORM 코어 |
-| `github.com/CUBRID/cubrid-go` | CUBRID SQL 드라이버 (사용자가 별도 임포트 필요, CGO) |
+| `github.com/cubrid-labs/cubrid-go` | CUBRID SQL driver (pure Go, no CGO) |
 
-> `github.com/CUBRID/cubrid-go`는 이 모듈의 `go.mod`에 포함되지 않습니다.
-> CGO + CUBRID CCI 라이브러리 의존성이 있으므로 사용자가 직접 임포트합니다:
-> `import _ "github.com/CUBRID/cubrid-go"`
+> `github.com/cubrid-labs/cubrid-go` is a pure Go SQL driver registered as "cubrid".
+>{
+> It is imported as:
+> `import _ "github.com/cubrid-labs/cubrid-go"`
 
 ## 브랜치 전략
 
