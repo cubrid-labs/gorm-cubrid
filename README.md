@@ -150,6 +150,19 @@ Performance benchmarks comparing CUBRID drivers against MySQL are tracked in the
 - Results published to [GitHub Pages dashboard](https://cubrid-labs.github.io/cubrid-benchmark/)
 
 
+## Ecosystem
+
+| Package | Description | Language |
+|:--------|:------------|:---------|
+| [cubrid-go](https://github.com/cubrid-labs/cubrid-go) | database/sql driver + GORM dialector | Go |
+| [pycubrid](https://github.com/cubrid-labs/pycubrid) | Python DB-API 2.0 driver | Python |
+| [sqlalchemy-cubrid](https://github.com/cubrid-labs/sqlalchemy-cubrid) | SQLAlchemy 2.0 dialect | Python |
+| [cubrid-client](https://github.com/cubrid-labs/cubrid-client) | TypeScript CAS client | TypeScript |
+| [drizzle-cubrid](https://github.com/cubrid-labs/drizzle-cubrid) | Drizzle ORM dialect | TypeScript |
+| [cubrid-rs](https://github.com/cubrid-labs/cubrid-rs) | Native Rust driver (sync + async) | Rust |
+| [sea-orm-cubrid](https://github.com/cubrid-labs/sea-orm-cubrid) | SeaORM backend for CUBRID | Rust |
+| [cubrid-cookbook](https://github.com/cubrid-labs/cubrid-cookbook) | Practical examples across ecosystems | Multi |
+
 ## License
 
 MIT
