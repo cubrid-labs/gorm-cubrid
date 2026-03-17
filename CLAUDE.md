@@ -9,11 +9,12 @@
 
 ## 파일 구조
 
-```
-cubrid.go       — Dialector 구현 (gorm.Dialector 인터페이스 전체)
-migrator.go     — Migrator 구현 (DDL, 스키마 조회)
-cubrid_test.go  — 단위 테스트 (CUBRID 서버 불필요)
-go.mod          — 의존성: gorm.io/gorm v1.25.10
+```mermaid
+flowchart TD
+    R[gorm-cubrid] --> F1[cubrid.go\nDialector 구현 gorm.Dialector 인터페이스 전체]
+    R --> F2[migrator.go\nMigrator 구현 DDL, 스키마 조회]
+    R --> F3[cubrid_test.go\n단위 테스트 CUBRID 서버 불필요]
+    R --> F4[go.mod\n의존성 gorm.io/gorm v1.25.10]
 ```
 
 ## 아키텍처

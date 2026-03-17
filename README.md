@@ -12,6 +12,14 @@
 
 CUBRID database driver for [GORM](https://gorm.io/).
 
+```mermaid
+flowchart TD
+    A[Application] --> B[GORM]
+    B --> C[gorm-cubrid Dialector]
+    C --> D[cubrid-go database/sql]
+    D --> E[CUBRID Server]
+```
+
 ## Requirements
 
 - Go 1.21+
