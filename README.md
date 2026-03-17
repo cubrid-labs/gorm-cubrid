@@ -130,6 +130,68 @@ cci:CUBRID:localhost:33000:demodb:dba:password:
 - Transactions
 - Hooks
 
+## AutoMigrate with CUBRID
+
+Basic usage:
+
+```go
+type User struct {
+    ID   uint
+    Name string
+}
+
+type Product struct {
+    ID    uint
+    Name  string
+    Price float64
+}
+
+if err := db.AutoMigrate(&User{}, &Product{}); err != nil {
+    panic(err)
+}
+```
+
+Best practices and CUBRID-specific notes:
+
+- Treat `bool` as an integer-backed type (`SMALLINT` semantics; emitted as `TINYINT(1)`), because CUBRID has no native `BOOLEAN` type.
+- CUBRID has no native JSON type. Store JSON payloads as `VARCHAR`/`CLOB` and validate in the application layer.
+- CUBRID DDL statements auto-commit. Schema changes from `AutoMigrate` cannot be rolled back inside a transaction.
+- Keep index definitions explicit (`gorm:"index"`, `gorm:"uniqueIndex"`) and review generated indexes for large tables before production rollout.
+- `AutoMigrate` handles table creation and additive changes well, but complex column type changes and some `ALTER TABLE` patterns may require manual SQL.
+- For production-critical systems, prefer versioned/manual migration files (or a dedicated migration tool) for deterministic review and rollback planning.
+
+## Soft Delete Support
+
+GORM soft delete works with CUBRID when a model includes `gorm.DeletedAt`.
+
+```go
+import "gorm.io/gorm"
+
+type User struct {
+    ID        uint
+    Name      string
+    DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+// Soft delete: sets deleted_at instead of physical delete.
+db.Delete(&user)
+
+// Normal queries automatically exclude rows where deleted_at is not NULL.
+var users []User
+db.Find(&users)
+
+// Include soft-deleted rows.
+db.Unscoped().Find(&users)
+
+// Permanently delete rows.
+db.Unscoped().Delete(&user)
+```
+
+Notes:
+
+- This works because CUBRID supports `DATETIME` columns and `WHERE ... IS NULL` filters used by GORM soft delete.
+- Soft delete in GORM is application-level behavior (query/update conventions), not a database-native soft-delete feature.
+
 ## Notes
 
 - CUBRID does not support **unsigned** integer types. `uint` fields are mapped
