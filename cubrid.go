@@ -213,22 +213,22 @@ func (dialector Dialector) DefaultValueOf(_ *schema.Field) clause.Expression {
 // BindVarTo writes a "?" positional bind variable placeholder.
 // CUBRID uses MySQL-style "?" placeholders.
 func (dialector Dialector) BindVarTo(writer clause.Writer, _ *gorm.Statement, _ interface{}) {
-	writer.WriteByte('?')
+	writer.WriteByte('?') // #nosec G104 -- clause.Writer buffer write; error always nil
 }
 
 // QuoteTo writes a backtick-quoted identifier to writer.
 // Handles dot-separated schema.table identifiers and backtick escaping.
 func (dialector Dialector) QuoteTo(writer clause.Writer, str string) {
-	writer.WriteByte('`')
+	writer.WriteByte('`') // #nosec G104 -- clause.Writer buffer write; error always nil
 	if strings.Contains(str, ".") {
 		parts := strings.SplitN(str, ".", 2)
-		writer.WriteString(strings.ReplaceAll(parts[0], "`", "``"))
-		writer.WriteString("`.`")
-		writer.WriteString(strings.ReplaceAll(parts[1], "`", "``"))
+		writer.WriteString(strings.ReplaceAll(parts[0], "`", "``")) // #nosec G104 -- clause.Writer buffer write; error always nil
+		writer.WriteString("`.`") // #nosec G104 -- clause.Writer buffer write; error always nil
+		writer.WriteString(strings.ReplaceAll(parts[1], "`", "``")) // #nosec G104 -- clause.Writer buffer write; error always nil
 	} else {
-		writer.WriteString(strings.ReplaceAll(str, "`", "``"))
+		writer.WriteString(strings.ReplaceAll(str, "`", "``")) // #nosec G104 -- clause.Writer buffer write; error always nil
 	}
-	writer.WriteByte('`')
+	writer.WriteByte('`') // #nosec G104 -- clause.Writer buffer write; error always nil
 }
 
 // Explain formats an SQL statement with its bind variables substituted,
