@@ -16,7 +16,7 @@ test-verbose:
 
 ## Integration tests (requires CUBRID 11.2+ running on localhost:33000)
 ## Set CUBRID_DSN to override the default connection string.
-CUBRID_DSN ?= cci:CUBRID:localhost:33000:demodb:dba::
+CUBRID_DSN ?= cubrid://dba:@localhost:33000/demodb
 test-integration:
 	CUBRID_DSN=$(CUBRID_DSN) go test -tags integration -race -count=1 ./...
 

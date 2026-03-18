@@ -12,14 +12,14 @@ import (
 // --- Dialector ---
 
 func TestName(t *testing.T) {
-	d := Open("cci:CUBRID:localhost:33000:demodb:public::")
+	d := Open("cubrid://public:@localhost:33000/demodb")
 	if d.Name() != "cubrid" {
 		t.Errorf("Name() = %q, want %q", d.Name(), "cubrid")
 	}
 }
 
 func TestOpen(t *testing.T) {
-	d := Open("cci:CUBRID:localhost:33000:demodb:public::")
+	d := Open("cubrid://public:@localhost:33000/demodb")
 	if d == nil {
 		t.Fatal("Open() returned nil")
 	}
@@ -29,7 +29,7 @@ func TestOpen(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	d := New(Config{DSN: "cci:CUBRID:localhost:33000:demodb:public::"})
+	d := New(Config{DSN: "cubrid://public:@localhost:33000/demodb"})
 	if d == nil {
 		t.Fatal("New() returned nil")
 	}
@@ -39,7 +39,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestNew_CustomDriverName(t *testing.T) {
-	d := New(Config{DriverName: "my_cubrid", DSN: "cci:CUBRID:localhost:33000:demodb:public::"})
+	d := New(Config{DriverName: "my_cubrid", DSN: "cubrid://public:@localhost:33000/demodb"})
 	inner := d.(*Dialector)
 	if inner.DriverName != "my_cubrid" {
 		t.Errorf("DriverName = %q, want %q", inner.DriverName, "my_cubrid")
@@ -49,7 +49,7 @@ func TestNew_CustomDriverName(t *testing.T) {
 // Initialize must not mutate the original Config when applying a default DriverName.
 // Sharing one Config across multiple gorm.Open calls must be safe.
 func TestInitialize_NoConfigMutation(t *testing.T) {
-	cfg := &Config{DSN: "cci:CUBRID:localhost:33000:demodb:public::"}
+	cfg := &Config{DSN: "cubrid://public:@localhost:33000/demodb"}
 	_ = New(*cfg) // simulate creating a Dialector from a shared config
 	if cfg.DriverName != "" {
 		t.Errorf("Config.DriverName was mutated to %q, want empty string", cfg.DriverName)
@@ -57,7 +57,7 @@ func TestInitialize_NoConfigMutation(t *testing.T) {
 }
 
 func TestNew_SkipPing(t *testing.T) {
-	d := New(Config{DSN: "cci:CUBRID:localhost:33000:demodb:public::", SkipPing: true})
+	d := New(Config{DSN: "cubrid://public:@localhost:33000/demodb", SkipPing: true})
 	inner := d.(*Dialector)
 	if !inner.SkipPing {
 		t.Error("SkipPing should be true")

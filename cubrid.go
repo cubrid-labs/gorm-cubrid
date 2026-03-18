@@ -8,11 +8,11 @@
 //
 // Then open a connection using the CUBRID DSN format:
 //
-//	cci:CUBRID:<host>:<port>:<dbname>:<user>:<password>:
+//	cubrid://[user[:password]]@host[:port]/database[?autocommit=true&timeout=30s]
 //
 // Example:
 //
-//	db, err := gorm.Open(cubrid.Open("cci:CUBRID:localhost:33000:demodb:public::"), &gorm.Config{})
+//	db, err := gorm.Open(cubrid.Open("cubrid://public:@localhost:33000/demodb"), &gorm.Config{})
 package cubrid
 
 import (
@@ -39,8 +39,8 @@ type Config struct {
 	DriverName string
 
 	// DSN is the CUBRID data source name.
-	// Format: cci:CUBRID:<host>:<port>:<dbname>:<user>:<password>:
-	// Example: cci:CUBRID:localhost:33000:demodb:public::
+	// Format: cubrid://[user[:password]]@host[:port]/database[?autocommit=true&timeout=30s]
+	// Example: cubrid://public:@localhost:33000/demodb
 	DSN string
 
 	// Conn allows providing an existing *sql.DB connection pool instead of
@@ -64,7 +64,7 @@ type Dialector struct {
 
 // Open creates a new CUBRID Dialector from a DSN string.
 //
-// DSN format: cci:CUBRID:<host>:<port>:<dbname>:<user>:<password>:
+// DSN format: cubrid://[user[:password]]@host[:port]/database[?autocommit=true&timeout=30s]
 //
 // Note: The CUBRID SQL driver must be imported separately:
 //

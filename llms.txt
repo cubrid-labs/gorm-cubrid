@@ -2,12 +2,12 @@
 
 > GORM database driver for CUBRID. Provides full ORM support including AutoMigrate, CRUD operations, associations, transactions, and hooks for Go 1.21+ applications.
 
-gorm-cubrid is a GORM dialector that enables Go developers to use CUBRID with GORM's full feature set — models, migrations, associations, hooks, and transactions. It connects to CUBRID via the CCI (Client C Interface) driver.
+gorm-cubrid is a GORM dialector that enables Go developers to use CUBRID with GORM's full feature set — models, migrations, associations, hooks, and transactions. It connects to CUBRID via the cubrid-go pure Go driver.
 
 Key facts:
-- DSN format: `cci:CUBRID:<host>:<port>:<dbname>:<user>:<password>:`
+- DSN format: `cubrid://[user[:password]]@host[:port]/database`
 - Install: `go get github.com/cubrid-labs/gorm-cubrid`
-- Also requires: `go get github.com/CUBRID/cubrid-go` (CCI-based SQL driver, requires CGO)
+- Also requires: `go get github.com/cubrid-labs/cubrid-go` (pure Go driver, no CGO)
 - Usage: `gorm.Open(cubrid.Open(dsn), &gorm.Config{})`
 - Supports: AutoMigrate, CRUD, HasOne, HasMany, BelongsTo, ManyToMany, transactions, hooks
 - CUBRID-specific: `bool` → `TINYINT(1)`, no unsigned types, `AUTO_INCREMENT` native

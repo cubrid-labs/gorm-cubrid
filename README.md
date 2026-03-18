@@ -52,8 +52,8 @@ import (
 )
 
 func main() {
-    // DSN format: cci:CUBRID:<host>:<port>:<dbname>:<user>:<password>:
-    dsn := "cci:CUBRID:localhost:33000:demodb:public::"
+    // DSN format: cubrid://[user[:password]]@host[:port]/database[?autocommit=true&timeout=30s]
+    dsn := "cubrid://public:@localhost:33000/demodb"
 
     db, err := gorm.Open(cubrid.Open(dsn), &gorm.Config{})
     if err != nil {
@@ -74,7 +74,7 @@ func main() {
 
 ```go
 db, err := gorm.Open(cubrid.New(cubrid.Config{
-    DSN:               "cci:CUBRID:localhost:33000:demodb:public::",
+    DSN:               "cubrid://public:@localhost:33000/demodb",
     DefaultStringSize: 512, // default VARCHAR size (default: 256)
 }), &gorm.Config{})
 ```
@@ -84,7 +84,7 @@ db, err := gorm.Open(cubrid.New(cubrid.Config{
 ```go
 import "database/sql"
 
-sqlDB, err := sql.Open("cubrid", "cci:CUBRID:localhost:33000:demodb:public::")
+sqlDB, err := sql.Open("cubrid", "cubrid://public:@localhost:33000/demodb")
 if err != nil {
     panic(err)
 }
@@ -112,20 +112,20 @@ db, err := gorm.Open(cubrid.New(cubrid.Config{Conn: sqlDB}), &gorm.Config{})
 ## DSN Format
 
 ```
-cci:CUBRID:<host>:<port>:<dbname>:<user>:<password>:
+cubrid://[user[:password]]@host[:port]/database[?autocommit=true&timeout=30s]
 ```
 
 | Field | Description | Example |
 |---|---|---|
-| `host` | CUBRID server hostname or IP | `localhost` |
-| `port` | CUBRID broker port | `33000` |
-| `dbname` | Database name | `demodb` |
-| `user` | Database user | `public` |
-| `password` | User password (empty if none) | `` |
+| `host` | CUBRID server hostname or IP (required) | `localhost` |
+| `port` | CUBRID broker port (default: 33000) | `33000` |
+| `database` | Database name (required) | `demodb` |
+| `user` | Database user (optional) | `public` |
+| `password` | User password (optional) | `` |
 
 Example:
 ```
-cci:CUBRID:localhost:33000:demodb:dba:password:
+cubrid://dba:password@localhost:33000/demodb
 ```
 
 ## Supported Features

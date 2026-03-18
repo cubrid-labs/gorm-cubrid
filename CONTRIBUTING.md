@@ -48,7 +48,7 @@ go test -tags integration ./...
 Set the connection DSN via environment variable:
 
 ```bash
-export CUBRID_DSN="cci:CUBRID:localhost:33000:demodb:dba::"
+export CUBRID_DSN="cubrid://dba:@localhost:33000/demodb"
 go test -tags integration ./...
 ```
 
